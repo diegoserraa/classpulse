@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { apiFetch } from "../../services/api";
+import { apiFetch } from "../../services/Api";
 
 const TAB_MS = 11000;
 

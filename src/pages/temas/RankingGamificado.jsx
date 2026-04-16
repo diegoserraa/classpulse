@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { apiFetch } from "../../services/api";
+import { apiFetch } from "../../services/Api";
 
 
 const MEDAL_C = ["#FFD700", "#C0C0C0", "#CD7F32"];
