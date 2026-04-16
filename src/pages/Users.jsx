@@ -30,7 +30,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import AddIcon from "@mui/icons-material/Add";
 
 import ModalAdicionarUsuario from "../components/ModalAdicionarUsuario";
-import { apiFetch } from "../services/api";
+import { apiFetch } from "../services/Api";
 
 function Users() {
   const theme = useTheme();

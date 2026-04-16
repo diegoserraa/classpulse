@@ -13,7 +13,7 @@ import {
   TextField
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import { apiFetch } from "../services/api";
+import { apiFetch } from "../services/Api";
 
 function CadastroRanking() {
   const theme = useTheme();

@@ -39,7 +39,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EditIcon from "@mui/icons-material/Edit";
-import { apiFetch } from "../services/api";
+import { apiFetch } from "../services/Api";
 
 function Historico() {
   const theme = useTheme();

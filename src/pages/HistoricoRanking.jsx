@@ -38,7 +38,7 @@ import PercentIcon from "@mui/icons-material/Percent";
 import WarningIcon from "@mui/icons-material/Warning";
 import GroupsIcon from "@mui/icons-material/Groups";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { apiFetch } from "../services/api";
+import { apiFetch } from "../services/Api";
 
 function HistoricoRanking() {
   const theme = useTheme();

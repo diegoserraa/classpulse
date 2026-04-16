@@ -33,7 +33,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import { apiFetch } from "../services/api";
+import { apiFetch } from "../services/Api";
 
 function Turma() {
   const theme = useTheme();

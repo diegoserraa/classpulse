@@ -3,7 +3,7 @@ import { Box, Typography, Button, IconButton, Chip } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CheckIcon from "@mui/icons-material/Check";
-import { apiFetch } from "../services/api";
+import { apiFetch } from "../services/Api";
 
 /* ─── Configuração dos temas ─────────────────────────────────────────
    Cada entrada tem:
