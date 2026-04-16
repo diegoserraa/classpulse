@@ -57,7 +57,7 @@ function AppRoutes() {
         <Route path="/game" element={<RankingGamificado />} />
         <Route path="/game2" element={<RankingGamificado2 />} />
         <Route path="/game3" element={<RankingGamificado3 />} />
-         <Route path="/game4" element={<MinecrafitClaro />} />
+        <Route path="/game4" element={<MinecrafitClaro />} />
         <Route path="/game5" element={<MinecrafitEscuro />} />
         <Route path="/game6" element={<Futuristico />} />
         <Route path="/totem" element={<Totem />} />
