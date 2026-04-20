@@ -120,12 +120,20 @@ function Sidebar({ open, toggleSidebar }) {
 
   const is = (path) => location.pathname === path;
 
-  function getUserFromToken() {
+function getUserFromToken() {
   const token = localStorage.getItem("token");
   if (!token) return null;
 
   try {
-    return JSON.parse(atob(token.split(".")[1]));
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    // 🔥 valida expiração
+    if (payload.exp * 1000 < Date.now()) {
+      localStorage.clear();
+      return null;
+    }
+
+    return payload;
   } catch {
     return null;
   }

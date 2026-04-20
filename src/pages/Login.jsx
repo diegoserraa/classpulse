@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
 import logo from "../assets/logo.png";
+import { startSessionTimer } from "../services/Session";
 
 /* ─── Floating particle canvas ──────────────────────────────────────────── */
 function ParticleCanvas() {
@@ -213,6 +214,7 @@ function Login() {
       if (!response.ok) throw new Error(data.error || "Erro ao fazer login");
       localStorage.setItem("token", data.token);
       navigate("/dashboard");
+      startSessionTimer();
     } catch (err) {
       setError(err.message);
     } finally {

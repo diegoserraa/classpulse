@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Conciliacao from "../pages/Conciliacao";
@@ -16,6 +17,7 @@ import Futuristico from "../pages/temas/Futuristico";
 import Users from "../pages/Users";
 import SelectTema from "../pages/SelectTema";
 import Totem from "../pages/Totem";
+import { startSessionTimer } from "../services/Session";
 
 /* 🔐 Função pra pegar user do token */
 function getUserFromToken() {
@@ -24,6 +26,13 @@ function getUserFromToken() {
 
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
+
+    // 🔥 valida expiração
+    if (payload.exp * 1000 < Date.now()) {
+      localStorage.clear();
+      return null;
+    }
+
     return payload;
   } catch {
     return null;
@@ -46,6 +55,9 @@ function PrivateRoute({ children, roles = [] }) {
 }
 
 function AppRoutes() {
+  useEffect(() => {
+    startSessionTimer();
+  }, []);
   return (
     <BrowserRouter>
       <Routes>
