@@ -197,30 +197,41 @@ function Login() {
     return () => clearTimeout(t);
   }, []);
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Erro ao fazer login");
-      localStorage.setItem("token", data.token);
-      navigate("/dashboard");
-      startSessionTimer();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+async function handleLogin(e) {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/auth/login`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok)
+      throw new Error(data.error || "Erro ao fazer login");
+
+    localStorage.setItem("token", data.token);
+
+    // 🔥 salva usuário corretamente
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    navigate("/dashboard");
+
+    startSessionTimer();
+
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <Box

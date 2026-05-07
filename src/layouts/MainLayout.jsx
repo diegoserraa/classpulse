@@ -32,21 +32,9 @@ function MainLayout({ children }) {
             transition: "all 0.3s"
           }}
         >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
             
-            {/* Lado esquerdo */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <IconButton
-                color="inherit"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-              >
-                <MenuIcon />
-              </IconButton>
-
-              <Typography variant="h6" noWrap>
-                CLASSPULSE
-              </Typography>
-            </Box>
+         
 
             {/* Lado direito */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

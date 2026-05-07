@@ -123,7 +123,7 @@ function CadastroRanking() {
       formData.append("arquivo_base", fileBase);
       formData.append("arquivo_faltas", fileFaltas);
 
-      const response = await fetchApi("/ranking/semanal", {
+      const response = await apiFetch("/ranking/semanal", {
         method: "POST",
         body: formData
       });

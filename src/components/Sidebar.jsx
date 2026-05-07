@@ -11,8 +11,7 @@ import {
   Tooltip,
   Collapse,
   Typography,
-  Avatar,
-  Chip
+  Avatar
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -26,9 +25,9 @@ import EmailIcon from "@mui/icons-material/Email";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import AddchartIcon from "@mui/icons-material/Addchart";
 import PaletteIcon from "@mui/icons-material/Palette";
+import { Person2Rounded } from "@mui/icons-material";
 
 import { useNavigate, useLocation } from "react-router-dom";
-import { Person2, Person2Outlined, Person2Rounded } from "@mui/icons-material";
 
 const SIDEBAR_OPEN_WIDTH = 230;
 const SIDEBAR_CLOSED_WIDTH = 64;
@@ -53,7 +52,13 @@ const sectionLabel = (text, open) =>
       {text}
     </Typography>
   ) : (
-    <Divider sx={{ borderColor: "rgba(255,255,255,0.07)", mx: 1.5, my: 1 }} />
+    <Divider
+      sx={{
+        borderColor: "rgba(255,255,255,0.07)",
+        mx: 1.5,
+        my: 1
+      }}
+    />
   );
 
 const navItemSx = (isActive, open) => ({
@@ -72,12 +77,10 @@ const navItemSx = (isActive, open) => ({
   }
 });
 
-// 🔥 SOMENTE ESSAS FUNÇÕES FORAM AJUSTADAS
-
 const iconSx = (isActive, open) => ({
   color: isActive ? "#818cf8" : "rgba(255,255,255,0.4)",
   minWidth: 0,
-  mr: open ? 1.5 : 0, // 🔥 aqui estava quebrando o alinhamento
+  mr: open ? 1.5 : 0,
   justifyContent: "center",
   "& svg": { fontSize: 18 }
 });
@@ -85,7 +88,7 @@ const iconSx = (isActive, open) => ({
 const subIconSx = {
   color: "rgba(255,255,255,0.3)",
   minWidth: 0,
-  mr: 0, // 🔥 remove desalinhamento
+  mr: 0,
   justifyContent: "center",
   "& svg": { fontSize: 16 }
 };
@@ -98,8 +101,6 @@ const textSx = (isActive) => ({
     whiteSpace: "nowrap"
   }
 });
-
-
 
 const subTextSx = (isActive) => ({
   "& .MuiListItemText-primary": {
@@ -116,30 +117,30 @@ function Sidebar({ open, toggleSidebar }) {
   const [emailOpen, setEmailOpen] = useState(false);
   const [rankingOpen, setRankingOpen] = useState(false);
 
-  
-
   const is = (path) => location.pathname === path;
 
-function getUserFromToken() {
-  const token = localStorage.getItem("token");
-  if (!token) return null;
+  function getUser() {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (!token || !user) return null;
 
-    // 🔥 valida expiração
-    if (payload.exp * 1000 < Date.now()) {
-      localStorage.clear();
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+
+      if (payload.exp * 1000 < Date.now()) {
+        localStorage.clear();
+        return null;
+      }
+
+      return JSON.parse(user);
+    } catch {
       return null;
     }
-
-    return payload;
-  } catch {
-    return null;
   }
-}
-const user = getUserFromToken();
-const isAdmin = user?.role === "ADMIN";
+
+  const user = getUser();
+  const isAdmin = user?.role === "ADMIN";
 
   return (
     <Drawer
@@ -155,12 +156,24 @@ const isAdmin = user?.role === "ADMIN";
           color: "white",
           transition: "width 0.25s cubic-bezier(0.4,0,0.2,1)",
           overflowX: "hidden",
-          borderRight: "0.5px solid rgba(255,255,255,0.07)"
+          overflowY: "auto",
+          height: "100vh",
+          borderRight: "0.5px solid rgba(255,255,255,0.07)",
+
+          "&::-webkit-scrollbar": {
+            width: "6px"
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "rgba(255,255,255,0.15)",
+            borderRadius: "10px"
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent"
+          }
         }
       }}
     >
-
-      {/* ── Logo + Toggle ── */}
+      {/* TOPO */}
       <Box
         sx={{
           display: "flex",
@@ -172,9 +185,6 @@ const isAdmin = user?.role === "ADMIN";
           borderBottom: "0.5px solid rgba(255,255,255,0.07)"
         }}
       >
-        {/* Logo mark */}
-     
-
         {open && (
           <Typography
             sx={{
@@ -195,20 +205,27 @@ const isAdmin = user?.role === "ADMIN";
           sx={{
             color: "rgba(255,255,255,0.3)",
             ml: open ? "auto" : 0,
-            "&:hover": { color: "rgba(255,255,255,0.7)", background: "rgba(255,255,255,0.06)" }
+            "&:hover": {
+              color: "rgba(255,255,255,0.7)",
+              background: "rgba(255,255,255,0.06)"
+            }
           }}
         >
           <MenuIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>
 
-      {/* ── Navigation ── */}
-      <List disablePadding sx={{ flex: 1, py: 1 }}>
-
-        {/* GERAL */}
+      {/* MENU */}
+      <List
+        disablePadding
+        sx={{
+          flex: 1,
+          py: 1,
+          overflowY: "auto"
+        }}
+      >
         {sectionLabel("Geral", open)}
 
-        {/* Dashboard */}
         <Tooltip title={open ? "" : "Dashboard"} placement="right">
           <ListItemButton
             selected={is("/")}
@@ -218,27 +235,16 @@ const isAdmin = user?.role === "ADMIN";
             <ListItemIcon sx={iconSx(is("/"), open)}>
               <DashboardIcon />
             </ListItemIcon>
+
             {open && (
-              <>
-                <ListItemText primary="Dashboard" sx={textSx(is("/"))} />
-                <Chip
-                  label="3"
-                  size="small"
-                  sx={{
-                    height: 18,
-                    fontSize: "10px",
-                    fontWeight: 600,
-                    background: "rgba(99,102,241,0.3)",
-                    color: "#a5b4fc",
-                    "& .MuiChip-label": { px: 0.75 }
-                  }}
-                />
-              </>
+              <ListItemText
+                primary="Dashboard"
+                sx={textSx(is("/"))}
+              />
             )}
           </ListItemButton>
         </Tooltip>
 
-        {/* Turmas */}
         <Tooltip title={open ? "" : "Turmas"} placement="right">
           <ListItemButton
             selected={is("/turmas")}
@@ -248,35 +254,39 @@ const isAdmin = user?.role === "ADMIN";
             <ListItemIcon sx={iconSx(is("/turmas"), open)}>
               <SchoolIcon />
             </ListItemIcon>
-            {open && <ListItemText primary="Turmas" sx={textSx(is("/turmas"))} />}
+
+            {open && (
+              <ListItemText
+                primary="Turmas"
+                sx={textSx(is("/turmas"))}
+              />
+            )}
           </ListItemButton>
         </Tooltip>
 
-    {isAdmin && (
-  <Tooltip title={open ? "" : "Usuarios"} placement="right">
-    <ListItemButton
-      selected={is("/usuarios")}
-      onClick={() => navigate("/usuarios")}
-      sx={navItemSx(is("/usuarios"), open)}
-    >
-      <ListItemIcon sx={iconSx(is("/usuarios"), open)}>
-        <Person2Rounded />
-      </ListItemIcon>
-      {open && (
-        <ListItemText
-          primary="Usuários"
-          sx={textSx(is("/usuarios"))}
-        />
-      )}
-    </ListItemButton>
-  </Tooltip>
-)}
-        
+        {isAdmin && (
+          <Tooltip title={open ? "" : "Usuarios"} placement="right">
+            <ListItemButton
+              selected={is("/usuarios")}
+              onClick={() => navigate("/usuarios")}
+              sx={navItemSx(is("/usuarios"), open)}
+            >
+              <ListItemIcon sx={iconSx(is("/usuarios"), open)}>
+                <Person2Rounded />
+              </ListItemIcon>
 
-        {/* COMUNICAÇÃO */}
+              {open && (
+                <ListItemText
+                  primary="Usuários"
+                  sx={textSx(is("/usuarios"))}
+                />
+              )}
+            </ListItemButton>
+          </Tooltip>
+        )}
+
         {sectionLabel("Comunicação", open)}
 
-        {/* Email group */}
         <Tooltip title={open ? "" : "Email"} placement="right">
           <ListItemButton
             onClick={() => setEmailOpen(!emailOpen)}
@@ -285,13 +295,25 @@ const isAdmin = user?.role === "ADMIN";
             <ListItemIcon sx={iconSx(false, open)}>
               <EmailIcon />
             </ListItemIcon>
+
             {open && (
               <>
                 <ListItemText primary="Email" sx={textSx(false)} />
+
                 {emailOpen ? (
-                  <ExpandLess sx={{ fontSize: 16, color: "rgba(255,255,255,0.25)" }} />
+                  <ExpandLess
+                    sx={{
+                      fontSize: 16,
+                      color: "rgba(255,255,255,0.25)"
+                    }}
+                  />
                 ) : (
-                  <ExpandMore sx={{ fontSize: 16, color: "rgba(255,255,255,0.25)" }} />
+                  <ExpandMore
+                    sx={{
+                      fontSize: 16,
+                      color: "rgba(255,255,255,0.25)"
+                    }}
+                  />
                 )}
               </>
             )}
@@ -301,31 +323,47 @@ const isAdmin = user?.role === "ADMIN";
         <Collapse in={emailOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             <ListItemButton
-              sx={{ ...navItemSx(is("/conciliacao"), open), pl: open ? 3.5 : 0 }}
+              sx={{
+                ...navItemSx(is("/conciliacao"), open),
+                pl: open ? 3.5 : 0
+              }}
               onClick={() => navigate("/conciliacao")}
             >
               <ListItemIcon sx={subIconSx}>
                 <SendIcon />
               </ListItemIcon>
-              {open && <ListItemText primary="Enviar" sx={subTextSx(is("/conciliacao"))} />}
+
+              {open && (
+                <ListItemText
+                  primary="Enviar"
+                  sx={subTextSx(is("/conciliacao"))}
+                />
+              )}
             </ListItemButton>
 
             <ListItemButton
-              sx={{ ...navItemSx(is("/historico"), open), pl: open ? 3.5 : 0 }}
+              sx={{
+                ...navItemSx(is("/historico"), open),
+                pl: open ? 3.5 : 0
+              }}
               onClick={() => navigate("/historico")}
             >
               <ListItemIcon sx={subIconSx}>
                 <HistoryIcon />
               </ListItemIcon>
-              {open && <ListItemText primary="Histórico" sx={subTextSx(is("/historico"))} />}
+
+              {open && (
+                <ListItemText
+                  primary="Histórico"
+                  sx={subTextSx(is("/historico"))}
+                />
+              )}
             </ListItemButton>
           </List>
         </Collapse>
 
-        {/* DESEMPENHO */}
         {sectionLabel("Desempenho", open)}
 
-        {/* Ranking group */}
         <Tooltip title={open ? "" : "Ranking"} placement="right">
           <ListItemButton
             onClick={() => setRankingOpen(!rankingOpen)}
@@ -334,13 +372,25 @@ const isAdmin = user?.role === "ADMIN";
             <ListItemIcon sx={iconSx(false, open)}>
               <BarChartIcon />
             </ListItemIcon>
+
             {open && (
               <>
                 <ListItemText primary="Ranking" sx={textSx(false)} />
+
                 {rankingOpen ? (
-                  <ExpandLess sx={{ fontSize: 16, color: "rgba(255,255,255,0.25)" }} />
+                  <ExpandLess
+                    sx={{
+                      fontSize: 16,
+                      color: "rgba(255,255,255,0.25)"
+                    }}
+                  />
                 ) : (
-                  <ExpandMore sx={{ fontSize: 16, color: "rgba(255,255,255,0.25)" }} />
+                  <ExpandMore
+                    sx={{
+                      fontSize: 16,
+                      color: "rgba(255,255,255,0.25)"
+                    }}
+                  />
                 )}
               </>
             )}
@@ -350,39 +400,66 @@ const isAdmin = user?.role === "ADMIN";
         <Collapse in={rankingOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             <ListItemButton
-              sx={{ ...navItemSx(is("/cadastro-ranking"), open), pl: open ? 3.5 : 0 }}
+              sx={{
+                ...navItemSx(is("/cadastro-ranking"), open),
+                pl: open ? 3.5 : 0
+              }}
               onClick={() => navigate("/cadastro-ranking")}
             >
               <ListItemIcon sx={subIconSx}>
                 <AddchartIcon />
               </ListItemIcon>
-              {open && <ListItemText primary="Gerar" sx={subTextSx(is("/cadastro-ranking"))} />}
+
+              {open && (
+                <ListItemText
+                  primary="Gerar"
+                  sx={subTextSx(is("/cadastro-ranking"))}
+                />
+              )}
             </ListItemButton>
 
             <ListItemButton
-              sx={{ ...navItemSx(is("/historico-ranking"), open), pl: open ? 3.5 : 0 }}
+              sx={{
+                ...navItemSx(is("/historico-ranking"), open),
+                pl: open ? 3.5 : 0
+              }}
               onClick={() => navigate("/historico-ranking")}
             >
               <ListItemIcon sx={subIconSx}>
                 <HistoryIcon />
               </ListItemIcon>
-              {open && <ListItemText primary="Histórico" sx={subTextSx(is("/historico-ranking"))} />}
+
+              {open && (
+                <ListItemText
+                  primary="Histórico"
+                  sx={subTextSx(is("/historico-ranking"))}
+                />
+              )}
             </ListItemButton>
-              <ListItemButton
-              sx={{ ...navItemSx(is("/tema"), open), pl: open ? 3.5 : 0 }}
+
+            <ListItemButton
+              sx={{
+                ...navItemSx(is("/tema"), open),
+                pl: open ? 3.5 : 0
+              }}
               onClick={() => navigate("/tema")}
             >
               <ListItemIcon sx={subIconSx}>
-                <PaletteIcon  />
+                <PaletteIcon />
               </ListItemIcon>
-              {open && <ListItemText primary="Tema" sx={subTextSx(is("/tema"))} />}
+
+              {open && (
+                <ListItemText
+                  primary="Tema"
+                  sx={subTextSx(is("/tema"))}
+                />
+              )}
             </ListItemButton>
           </List>
         </Collapse>
-
       </List>
 
-      {/* ── Footer / User ── */}
+      {/* FOOTER USER */}
       <Box
         sx={{
           borderTop: "0.5px solid rgba(255,255,255,0.07)",
@@ -400,7 +477,9 @@ const isAdmin = user?.role === "ADMIN";
             justifyContent: open ? "flex-start" : "center",
             cursor: "pointer",
             transition: "background 0.15s",
-            "&:hover": { background: "rgba(255,255,255,0.05)" }
+            "&:hover": {
+              background: "rgba(255,255,255,0.05)"
+            }
           }}
         >
           <Avatar
@@ -409,25 +488,40 @@ const isAdmin = user?.role === "ADMIN";
               height: 28,
               fontSize: "11px",
               fontWeight: 600,
-              background: "linear-gradient(135deg, #6366f1, #a78bfa)",
+              background:
+                "linear-gradient(135deg, #6366f1, #a78bfa)",
               flexShrink: 0
             }}
           >
-            AD
+            {user?.nome?.charAt(0)?.toUpperCase() || "U"}
           </Avatar>
+
           {open && (
             <Box sx={{ overflow: "hidden" }}>
-              <Typography sx={{ fontSize: "12px", fontWeight: 500, color: "#e2e8f0", lineHeight: 1.3 }}>
-                Admin
+              <Typography
+                sx={{
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  color: "#e2e8f0",
+                  lineHeight: 1.3
+                }}
+              >
+                {user?.nome || "Usuário"}
               </Typography>
-              <Typography sx={{ fontSize: "10px", color: "rgba(255,255,255,0.25)", lineHeight: 1.3 }}>
-                CLASSPULSE · 2026
+
+              <Typography
+                sx={{
+                  fontSize: "10px",
+                  color: "rgba(255,255,255,0.25)",
+                  lineHeight: 1.3
+                }}
+              >
+                {user?.email}
               </Typography>
             </Box>
           )}
         </Box>
       </Box>
-
     </Drawer>
   );
 }
