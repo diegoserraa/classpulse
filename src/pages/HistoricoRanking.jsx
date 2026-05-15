@@ -62,6 +62,15 @@ function HistoricoRanking() {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   // ================= BUSCA =================
+
+  const parseDateLocal = (dateString) => {
+  if (!dateString) return null;
+
+  const [year, month, day] = dateString.split("T")[0].split("-");
+
+  return new Date(year, month - 1, day);
+};
+
   const buscar = async () => {
     setLoading(true);
     try {
@@ -101,7 +110,7 @@ function HistoricoRanking() {
     const meses = {};
 
     dados.forEach((item) => {
-      const data = new Date(item.data_inicio);
+      const data = parseDateLocal(item.data_inicio);
 
       const mesKey = data.toLocaleDateString("pt-BR", {
         month: "long",
@@ -132,15 +141,17 @@ function HistoricoRanking() {
       ...mes,
       turmas: Object.values(mes.turmas).map((turma) => {
         const itensOrdenados = turma.itens.sort(
-          (a, b) => new Date(a.data_inicio) - new Date(b.data_inicio)
+          (a, b) =>
+  parseDateLocal(a.data_inicio) -
+  parseDateLocal(b.data_inicio)
         );
 
         const inicio = new Date(
-          Math.min(...itensOrdenados.map((i) => new Date(i.data_inicio)))
+          Math.min(...itensOrdenados.map((i) => parseDateLocal(i.data_inicio)))
         );
 
         const fim = new Date(
-          Math.max(...itensOrdenados.map((i) => new Date(i.data_fim)))
+          Math.max(...itensOrdenados.map((i) => parseDateLocal(i.data_fim)))
         );
 
  const totalPossivel = itensOrdenados.reduce(
@@ -408,8 +419,8 @@ const resumo = useMemo(() => {
                                   {turma.itens.map((item) => (
                                     <TableRow key={item.id}>
                                       <TableCell>
-                                        {new Date(item.data_inicio).toLocaleDateString()} -{" "}
-                                        {new Date(item.data_fim).toLocaleDateString()}
+                                        {parseDateLocal(item.data_inicio).toLocaleDateString("pt-BR")} -{" "}
+                                        {parseDateLocal(item.data_fim).toLocaleDateString("pt-BR")}
                                       </TableCell>
 
                                       <TableCell>{item.total_alunos}</TableCell>

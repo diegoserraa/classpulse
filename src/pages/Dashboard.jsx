@@ -657,195 +657,215 @@ function BarChart({ data, multi = false }) {
   // 🔥 MULTI TURMAS
   // =========================
 
-  if (multi) {
+ if (multi) {
 
-    const todosValores = data.flatMap((t) =>
-      t.dados.map((d) => d.presenca_media)
-    );
+  const semanas = [
+    ...new Set(
+      data.flatMap((t) =>
+        t.dados.map((d) => d.semana)
+      )
+    )
+  ];
 
-    const mn = Math.max(
-      0,
-      Math.floor(Math.min(...todosValores) / 10) * 10 - 10
-    );
+  const todosValores = data.flatMap((t) =>
+    t.dados.map((d) => d.presenca_media)
+  );
 
-    const mx = Math.min(
-      100,
-      Math.ceil(Math.max(...todosValores) / 10) * 10 + 5
-    );
+  const mn = Math.max(
+    0,
+    Math.floor(Math.min(...todosValores) / 10) * 10 - 10
+  );
 
-    const rng = mx - mn || 1;
+  const mx = Math.min(
+    100,
+    Math.ceil(Math.max(...todosValores) / 10) * 10 + 5
+  );
 
-    const ty = (v) =>
-      P.t + iH - ((v - mn) / rng) * iH;
+  const rng = mx - mn || 1;
 
-    const ySteps = [];
+  const ty = (v) =>
+    P.t + iH - ((v - mn) / rng) * iH;
 
-    for (let v = mn; v <= mx; v += 10) {
-      ySteps.push(v);
-    }
+  const ySteps = [];
 
-    const totalSemanas =
-      data[0]?.dados?.length || 1;
+  for (let v = mn; v <= mx; v += 10) {
+    ySteps.push(v);
+  }
 
-    const grupoW = iW / totalSemanas;
+  const grupoW = iW / semanas.length;
 
-    const barraW =
-      Math.min(18, grupoW / (data.length + 1));
+  const barraW =
+    Math.min(18, grupoW / (data.length + 1));
 
-    return (
-      <svg
-        viewBox={`0 0 ${VW} ${VH}`}
-        preserveAspectRatio="none"
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
-        }}
-      >
+  return (
+    <svg
+      viewBox={`0 0 ${VW} ${VH}`}
+      preserveAspectRatio="none"
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "block",
+      }}
+    >
 
-        {/* GRID */}
+      {ySteps.map((v) => {
 
-        {ySteps.map((v) => {
+        const y = ty(v);
 
-          const y = ty(v);
+        return (
+          <g key={v}>
+            <line
+              x1={P.l}
+              y1={y}
+              x2={VW - P.r}
+              y2={y}
+              stroke="rgba(0,0,0,0.05)"
+              strokeDasharray="4 3"
+            />
 
-          return (
-            <g key={v}>
-              <line
-                x1={P.l}
-                y1={y}
-                x2={VW - P.r}
-                y2={y}
-                stroke="rgba(0,0,0,0.05)"
-                strokeDasharray="4 3"
-              />
+            <text
+              x={P.l - 6}
+              y={y + 3}
+              textAnchor="end"
+              fontSize={9}
+              fill="#94A3B8"
+            >
+              {v}%
+            </text>
+          </g>
+        );
+      })}
 
-              <text
-                x={P.l - 6}
-                y={y + 3}
-                textAnchor="end"
-                fontSize={9}
-                fill="#94A3B8"
-              >
-                {v}%
-              </text>
-            </g>
-          );
-        })}
+      {semanas.map((semana, semanaIndex) => {
 
-        {/* BARRAS */}
+        const grupoX =
+          P.l + (semanaIndex * grupoW);
 
-        {data.map((turma, turmaIndex) => {
+       const barrasNoMes = data.filter((turma) =>
+  turma.dados.some((d) => d.semana === semana)
+).length;
 
-          const cor =
-            cores[turmaIndex % cores.length];
+const totalBarras =
+  barrasNoMes * barraW;
 
-          return turma.dados.map((item, i) => {
+        const offsetCentral =
+          (grupoW - totalBarras) / 2;
 
-            const grupoX =
-              P.l + (i * grupoW);
+        return (
+          <g key={semana}>
 
-            const totalBarras =
-  data.length * barraW;
+            {data.map((turma, turmaIndex) => {
 
-const offsetCentral =
-  (grupoW - totalBarras) / 2;
+              const item = turma.dados.find(
+                (d) => d.semana === semana
+              );
+
+              if (!item) return null;
+
+              const cor =
+                cores[turmaIndex % cores.length];
+
+             const turmasComDados = data.filter((turma) =>
+  turma.dados.some((d) => d.semana === semana)
+);
+
+const posicaoReal =
+  turmasComDados.findIndex(
+    (t) => t.turma === turma.turma
+  );
 
 const x =
   grupoX +
   offsetCentral +
-  (turmaIndex * barraW);
+  (posicaoReal * barraW);
 
-            const y =
-              ty(item.presenca_media);
+              const y =
+                ty(item.presenca_media);
 
-            const h =
-              (P.t + iH) - y;
+              const h =
+                (P.t + iH) - y;
 
-            const isH =
-              hov === `${turmaIndex}-${i}`;
+              const isH =
+                hov === `${turmaIndex}-${semanaIndex}`;
 
-            return (
-              <g
-                key={`${turmaIndex}-${i}`}
-                onMouseEnter={() =>
-                  setHov(`${turmaIndex}-${i}`)
-                }
-                onMouseLeave={() =>
-                  setHov(null)
-                }
-              >
+              return (
+                <g
+                  key={`${turmaIndex}-${semanaIndex}`}
+                  onMouseEnter={() =>
+                    setHov(`${turmaIndex}-${semanaIndex}`)
+                  }
+                  onMouseLeave={() =>
+                    setHov(null)
+                  }
+                >
 
-                <rect
-                  x={x}
-                  y={y}
-                  width={barraW}
-                  height={h}
-                  rx={4}
-                  fill={cor}
-                  opacity={isH ? 1 : 0.85}
-                />
+                  <rect
+                    x={x}
+                    y={y}
+                    width={barraW}
+                    height={h}
+                    rx={4}
+                    fill={cor}
+                    opacity={isH ? 1 : 0.85}
+                  />
 
-                {/* LABEL SEMANA */}
+                  {isH && (
+                    <g>
 
-                {turmaIndex === 0 && (
-                  <text
-                    x={grupoX + grupoW / 2}
-                    y={VH - 2}
-                    textAnchor="middle"
-                    fontSize={8}
-                    fill="#94A3B8"
-                  >
-                    {item.semana}
-                  </text>
-                )}
+                      <rect
+                        x={x - 28}
+                        y={y - 42}
+                        width={80}
+                        height={34}
+                        rx={8}
+                        fill="#1A2540"
+                      />
 
-                {/* TOOLTIP */}
+                      <text
+                        x={x + 12}
+                        y={y - 28}
+                        textAnchor="middle"
+                        fontSize={8}
+                        fill="rgba(255,255,255,.7)"
+                      >
+                        {turma.turma}
+                      </text>
 
-                {isH && (
-                  <g>
+                      <text
+                        x={x + 12}
+                        y={y - 14}
+                        textAnchor="middle"
+                        fontSize={11}
+                        fill="#fff"
+                        fontWeight="600"
+                      >
+                        {item.presenca_media.toFixed(1)}%
+                      </text>
 
-                    <rect
-                      x={x - 28}
-                      y={y - 42}
-                      width={80}
-                      height={34}
-                      rx={8}
-                      fill="#1A2540"
-                    />
+                    </g>
+                  )}
 
-                    <text
-                      x={x + 12}
-                      y={y - 28}
-                      textAnchor="middle"
-                      fontSize={8}
-                      fill="rgba(255,255,255,.7)"
-                    >
-                      {turma.turma}
-                    </text>
+                </g>
+              );
+            })}
 
-                    <text
-                      x={x + 12}
-                      y={y - 14}
-                      textAnchor="middle"
-                      fontSize={11}
-                      fill="#fff"
-                      fontWeight="600"
-                    >
-                      {item.presenca_media.toFixed(1)}%
-                    </text>
+            <text
+              x={grupoX + grupoW / 2}
+              y={VH - 2}
+              textAnchor="middle"
+              fontSize={8}
+              fill="#94A3B8"
+            >
+              {semana}
+            </text>
 
-                  </g>
-                )}
+          </g>
+        );
+      })}
 
-              </g>
-            );
-          });
-        })}
-
-      </svg>
-    );
-  }
+    </svg>
+  );
+}
 
   return null;
 }
