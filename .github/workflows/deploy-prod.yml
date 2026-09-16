@@ -1,8 +1,8 @@
-name: Deploy
+name: Deploy Prod
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -16,9 +16,9 @@ jobs:
           rsync -av --delete \
             --exclude='.git' \
             --exclude='.env' \
-            "$GITHUB_WORKSPACE"/ /var/www/classpulse/dev/frontend
+            "$GITHUB_WORKSPACE"/ /var/www/classpulse/prod/frontend
 
       - name: Build e subir container
         run: |
-          cd /var/www/classpulse/dev/frontend
+          cd /var/www/classpulse/prod/frontend
           docker compose up -d --build
